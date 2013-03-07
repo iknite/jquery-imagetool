@@ -250,7 +250,7 @@
 
 				});
 
-				if($.browser.msie) {
+				if(/msie/.test(navigator.userAgent)) {
 					image.attr("src", image.attr("src") + '?' + (Math.round(2048 * Math.random())));
 				}
 			}); // end this.each
