@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<title>Imagetool demo</title>
+	<meta name="generator" content="BBEdit 8.2" />
+	<script src="../jquery/jquery-1.4.2.min.js" type="text/javascript"></script>
+	<script src="../jquery/jquery-ui-1.8.custom.min.js" type="text/javascript"></script>
+	<script src="../jquery/jquery.metadata.min.js" type="text/javascript"></script>
+	
+	<script src="jquery.ui.imagetool.js" type="text/javascript"></script>
+    
+    <script type="text/javascript">
+      $(function() {
+        $("img.a").each(function() {
+          var settings = $.extend({}, $(this).metadata(), {
+            allowResizeX: true
+           ,allowResizeY: true
+           ,ready: function() {}
+           ,change: function(event, dim) {
+             $("input[name=dimensions]").val("x: " + dim.x + ", y: " + dim.y + ", w: " + dim.w + ", h: " + dim.h);
+            }
+          });
+          $(this).imagetool(settings);
+          });
+
+        $("input[name=reset]").click(function() {
+        	$("img.a").imagetool('reset', {src:'portrait.jpg', viewportWidth: 600,x: 0, y: 0.33375, w: 1, h: 0.5});
+        });
+
+        $("input[name=move]").click(function() {
+          console.dir($("img.a").imagetool('properties'));
+        	$("img.a").imagetool('option', 'x', 0.04);
+        	$("img.a").imagetool('option', 'y', 0.04);
+        	//alert($("img.a").imagetool("option", "imageWidth"));
+        });
+
+        $("input[name=data]").click(function() {
+        	var dim = $("img.a").imagetool('dimensions');
+        	$("input[name=dimensions]").val("x: " + dim.x + ", y: " + dim.y + ", w: " + dim.w + ", h: " + dim.h);
+        	
+        });
+
+        /*
+        $("img.b").imagetool({
+          loading: "load.gif"
+          	,allowZoom: false
+            ,allowPan: false
+         ,imageWidth: 800
+         ,imageHeight: 533
+         ,viewportWidth: 400
+         ,viewportHeight: 300
+        });
+        */
+      });
+    </script>
+  </head>
+  <body>
+  	<img class="a {viewportWidth: 400,viewportHeight: 400,x: 0.4004292783338513,y: 0.3006338195590597,w: 0.498977293873958,h: 0.3742329704054685}" src="image.jpg" />
+    
+    http://nrkmci27767.intern.nrk.no:9999/service/api/1.0/data/3krdluCIV1-BBhdqZGS11g-0Vcj3pzo0eca3tNt2B5xg
+    
+    <input type="button" name="reset" value="Reset"/>
+    <input type="button" name="data" value="Data"/>
+    <input type="button" name="move" value="Move"/>
+    <br />
+    <input type="text" size="80" name="dimensions"/>
+    
+    <!-- 
+    <img class="a" src="http://homepage.mac.com/bendik/imagetool/demo/image.jpg" />
+    <img class="b" src="image.jpg" />
+     -->
+  </body>
+</html>
