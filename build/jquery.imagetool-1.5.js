@@ -337,7 +337,7 @@
 		dim.bottomY = dim.topY + (dim.viewportHeight / scale);
 
 		if (typeof dim.callback == 'function') {
-			dim.callback(image, parseInt(dim.topX), parseInt(dim.topY), parseInt(dim.bottomX), parseInt(dim.bottomY));
+			dim.callback(image, parseInt(dim.topX, 10), parseInt(dim.topY, 10), parseInt(dim.bottomX, 10), parseInt(dim.bottomY, 10));
 		}
 		return image;
 	}
