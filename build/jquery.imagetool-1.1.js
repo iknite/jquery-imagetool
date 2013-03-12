@@ -78,37 +78,38 @@
 
 
 ;(function($) {
+    'use strict';
 
 	// Default settings   
 	var defaultSettings = {
-		allowZoom: true
-		,allowPan: true
-		,zoomCursor: "crosshair"
-		,panCursor: "move"
-		,disabledCursor: "not-allowed"
-		,viewportWidth: 400
-		,viewportHeight: 300
-		,maxWidth: 2500
-		,topX: -1
-		,topY: -1
-		,bottomX: -1 
-		,bottomY: -1
-		,callback: function(topX, topY, bottomX, bottomY) {}
+		allowZoom: true,
+		allowPan: true,
+		zoomCursor: "crosshair",
+		panCursor: "move",
+		disabledCursor: "not-allowed",
+		viewportWidth: 400,
+		viewportHeight: 300,
+		maxWidth: 2500,
+		topX: -1,
+		topY: -1,
+		bottomX: -1,
+		bottomY: -1,
+		callback: function(topX, topY, bottomX, bottomY) {}
 	};
   
-	function handleMouseOver(event) {
+	var handleMouseOver = function (event) {
 		var image = $(this);
 		var dim = image.data("dim");
 		image.css("cursor", dim.cursor);
-	}
+	};
 	
-	function handleMouseOut(event) {
+	var handleMouseOut= function (event) {
 		var image = $(this);
 		var dim = image.data("dim");
 		image.css("cursor", dim.cursor);
-	}
+	};
 
-	function handleMouseDown(mousedownEvent) {
+	var handleMouseDown = function (mousedownEvent) {
 		mousedownEvent.preventDefault();
 		var image = $(this);
 		var dim = image.data("dim");
@@ -116,8 +117,8 @@
 		dim.origoX = mousedownEvent.clientX;
 		dim.origoY = mousedownEvent.clientY;
 
-		var clickX = (mousedownEvent.pageX - $(this).offset({scroll: false}).left);
-		var clickY = (mousedownEvent.pageY - $(this).offset({scroll: false}).top);
+//		var clickX = (mousedownEvent.pageX - $(this).offset({scroll: false}).left);
+//		var clickY = (mousedownEvent.pageY - $(this).offset({scroll: false}).top);
 
 		if(dim.allowZoom && (mousedownEvent.shiftKey || mousedownEvent.ctrlKey) ) {
 			dim.cursor = dim.zoomCursor;
@@ -145,7 +146,7 @@
 			image.store();
 		});
 		return false;
-	}
+	};
 
 	$.fn.extend({
 		setup: function() {
@@ -193,30 +194,27 @@
 			image.store();
 
 			image.css({
-				position: "relative"
-				,display: "block"
+				position: "relative",
+				display: "block"
 			});
 
-	    if(dim.allowPan || dim.allowZoom) {
-	    	image.mousedown(handleMouseDown);
-	    	image.mouseover(handleMouseOver);
-	    	image.mouseout(handleMouseOut);
-	    }
-	    else {
-	    	image.css("cursor", dim.disabledCursor);
-	    	image.mousedown(function(e) {
-	    		e.preventDefault();
-	    	});
-	    }
-			
-
-
+            if(dim.allowPan || dim.allowZoom) {
+                image.mousedown(handleMouseDown);
+                image.mouseover(handleMouseOver);
+                image.mouseout(handleMouseOut);
+            }
+            else {
+                image.css("cursor", dim.disabledCursor);
+                image.mousedown(function(e) {
+                    e.preventDefault();
+                });
+            }
 
 			//image.mouseup(disableAndStore);
 			//
-		}
+		},
 
-		,imagetool: function(settings) {
+		imagetool: function(settings) {
 			return this.each(function() {
 				var image = $(this).css({display: "none"});
 
@@ -227,11 +225,11 @@
 
 				// Set up the viewport        
 				var viewportCss = {
-					backgroundColor: "#fff"
-					,position: "relative"
-					,overflow: "hidden"
-					,width: dim.viewportWidth + "px"
-					,height: dim.viewportHeight + "px"
+					backgroundColor: "#fff",
+					position: "relative",
+					overflow: "hidden",
+					width: dim.viewportWidth + "px",
+					height: dim.viewportHeight + "px"
 				};
 				var viewportElement = $("<div class=\"viewport\"><\/div>");
 				viewportElement.css(viewportCss);
@@ -254,9 +252,9 @@
 					image.attr("src", image.attr("src") + '?' + (Math.round(2048 * Math.random())));
 				}
 			}); // end this.each
-		} // End imagetool()
+		}, // End imagetool()
 		
-		,store: function() {
+		store: function() {
 		var image = $(this);
 		var dim = image.data("dim");
 
@@ -268,17 +266,17 @@
 		dim.bottomX = dim.topX + (dim.viewportWidth / scale);
 		dim.bottomY = dim.topY + (dim.viewportHeight / scale);
 
-		if(typeof dim.callback == 'function') {
-			dim.callback(parseInt(dim.topX), parseInt(dim.topY), parseInt(dim.bottomX), parseInt(dim.bottomY));
+		if(typeof dim.callback === 'function') {
+			dim.callback(parseInt(dim.topX, 10), parseInt(dim.topY, 10), parseInt(dim.bottomX, 10), parseInt(dim.bottomY, 10));
 		}
 		return image;
-	}
+	},
 
-	,disableAndStore: function() {
+	disableAndStore: function() {
 		$(this).unbind("mousemove").store();      
-	}
+	},
 
-	,zoomIn: function(){
+	zoomIn: function(){
 		var factor = 3;
 
 		var image = $(this);
@@ -294,9 +292,9 @@
 			dim.origoY = dim.origoY + factor;
 		}
 		image.store();
-	}
+	},
 	
-	,zoomOut: function(){
+	zoomOut: function(){
 		var factor = -3;
 		
 		var image = $(this);
@@ -312,10 +310,10 @@
 			dim.origoY = dim.origoY + factor;
 		}
 		image.store();
-	}
+	},
 	
 	
-	,zoom: function(e) {
+	zoom: function(e) {
 		e.preventDefault();
 		var image = $(this);
 		var dim = image.data("dim");
@@ -331,9 +329,9 @@
 		if(image.resize()) {
 			dim.origoY = e.clientY;
 		}
-	}
+	},
 
-	,pan: function(e) {
+	pan: function(e) {
 		e.preventDefault();
 		var image = $(this);
 		var dim = image.data("dim");
@@ -353,11 +351,11 @@
 		dim.x = targetX;
 		dim.y = targetY;
 		image.move();
-	} // end pan
+	}, // end pan
 
 
 
-	,move: function() {
+	move: function() {
 		var image = $(this);
 		var dim = image.data("dim");
 		var minX = -dim.width + dim.viewportWidth;
@@ -379,45 +377,41 @@
 
 
 		$(this).css({
-			left: dim.x + "px"
-			,top: dim.y + "px"
+			left: dim.x + "px",
+			top: dim.y + "px"
 		});
 		return image;
-	}
+	},
 
-
-
-
-
-	,resize: function() {
+	resize: function() {
 		var image = $(this);
 		var dim = image.data("dim");
 		// When attempting to scale the image below the minimum, set the size to minimum
 		var wasResized = true;
 		if(dim.width < dim.viewportWidth) {
-			dim.height = parseInt(dim.actualHeight * (dim.viewportWidth/dim.actualWidth));
+			dim.height = parseInt(dim.actualHeight * (dim.viewportWidth/dim.actualWidth), 10);
 			dim.width = dim.viewportWidth;
 			wasResized = false;
 
 		}
 
 		if(dim.height < dim.viewportHeight) {
-			dim.width = parseInt(dim.actualWidth * (dim.viewportHeight/dim.actualHeight));
+			dim.width = parseInt(dim.actualWidth * (dim.viewportHeight/dim.actualHeight), 10);
 			dim.height = dim.viewportHeight;
 			wasResized = false;
 		}
 
 
 		if(dim.width > dim.maxWidth) {
-			dim.height = parseInt(dim.height * (dim.maxWidth/dim.width));
+			dim.height = parseInt(dim.height * (dim.maxWidth/dim.width), 10);
 			dim.width = dim.maxWidth;
 			wasResized = false;
 		}
 
 
 		$(this).css({
-			width: dim.width + "px"
-			,height: dim.height + "px"
+			width: dim.width + "px",
+			height: dim.height + "px"
 		});
 
 
