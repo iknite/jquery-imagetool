@@ -1,9 +1,4 @@
 /**
- * $Date$
- * 
- * Revision: $Revision$
- * 
- * 
  * Imagetool
  * 
  * Imagetool is a simple plugin for jQuery providing basic cropping and scaling capabilities for images.
@@ -12,14 +7,15 @@
  *
  * Tested in Safari 3, Firefox 2, MSIE 6, MSIE 7
  * 
- * Version 1.0
- * August 8, 2008
+ * Version 1.6
+ * March 13, 2013
  *
- * Copyright (c) 2008 Bendik Rognlien Johansen
- * 
+ * Licensed under GNU GPL v3
+ *
  * @desc Adds editing capabilities to image (<img>) elements
  * @author Bendik Rognlien Johansen
- * @version 1.0
+ * @version 1.6
+ * @license GNU GPL v3
  *
  * @name Imagetools
  * @type jQuery
@@ -78,99 +74,47 @@
 
 
 ;(function($) {
+    'use strict';
 
 	// Default settings   
 	var defaultSettings = {
-		allowZoom: true
-		,allowPan: true
-		,zoomCursor: "crosshair"
-		,panCursor: "move"
-		,disabledCursor: "not-allowed"
-		,viewportWidth: 400
-		,viewportHeight: 300
-		,maxWidth: 2500
-		,topX: -1
-		,topY: -1
-		,bottomX: -1 
-		,bottomY: -1
-		,callback: function(topX, topY, bottomX, bottomY) {}
+		allowZoom: true,
+		allowPan: true,
+		zoomCursor: "crosshair",
+		panCursor: "move",
+		disabledCursor: "not-allowed",
+		viewportWidth: 400,
+		viewportHeight: 300,
+		maxWidth: 2500,
+		topX: -1,
+		topY: -1,
+		bottomX: -1,
+		bottomY: -1,
+		callback: function(topX, topY, bottomX, bottomY) {}
 	};
   
-	function handleMouseOver(event) {
+	var handleMouseOver = function (event) {
 		var image = $(this);
 		var dim = image.data("dim");
 		image.css("cursor", dim.cursor);
-	}
+	};
 	
-	function handleMouseOut(event) {
+	var handleMouseOut= function (event) {
 		var image = $(this);
 		var dim = image.data("dim");
 		image.css("cursor", dim.cursor);
-	}
-	
-	function handleKeyDown(e) {
-		if(e.which >= 37 && e.which <= 40) {
-			e.preventDefault();
-			console.log("Key pressed: " + e.which);
-			var image = $(document).data("currentImage");
-			var dim = image.data("dim");
+	};
 
-			if((e.shiftKey || e.ctrlKey)) {
-			  var factor = 1;
-				switch (e.which) {
-				case 37:
-				case 40:
-					factor = 0.99;	
-					break;
-				case 39:
-				case 38:
-					factor = 1.01;
-					break;
-				}
-				dim.oldWidth = dim.width;
-				dim.oldHeight = dim.height;
-
-				dim.width = ((factor) * dim.width);
-				dim.height = ((factor) * dim.height);
-				image.resize();
-				
-			}
-			else {
-
-				switch (e.which) {
-				case 37:
-					dim.x--;
-					break;
-				case 39:
-					dim.x++;
-					break;
-				case 38:
-					dim.y--;
-					break;
-				case 40:
-					dim.y++;
-					break;
-				}
-
-
-				image.move();
-			}
-		}
-	}
-
-	function handleMouseDown(mousedownEvent) {
+	var handleMouseDown = function (mousedownEvent) {
 		mousedownEvent.preventDefault();
 		var image = $(this);
-		
-		$(document).data("currentImage", image);
-		
 		var dim = image.data("dim");
 
 		dim.origoX = mousedownEvent.clientX;
 		dim.origoY = mousedownEvent.clientY;
 
-		var clickX = (mousedownEvent.pageX - $(this).offset({scroll: false}).left);
-		var clickY = (mousedownEvent.pageY - $(this).offset({scroll: false}).top);
+//		var clickX = (mousedownEvent.pageX - $(this).offset({scroll: false}).left);
+//		var clickY = (mousedownEvent.pageY - $(this).offset({scroll: false}).top);
 
 		if(dim.allowZoom && (mousedownEvent.shiftKey || mousedownEvent.ctrlKey) ) {
 			dim.cursor = dim.zoomCursor;
@@ -198,7 +142,7 @@
 			image.store();
 		});
 		return false;
-	}
+	};
 
 	$.fn.extend({
 		setup: function() {
@@ -246,31 +190,27 @@
 			image.store();
 
 			image.css({
-				position: "relative"
-				,display: "block"
+				position: "relative",
+				display: "block"
 			});
 
-	    if(dim.allowPan || dim.allowZoom) {
-	    	image.mousedown(handleMouseDown);
-	    	image.mouseover(handleMouseOver);
-	    	image.mouseout(handleMouseOut);
-	    	image.focus(function() {
-	    		console.log("Image recieved focus.");
-	    		
-	    	});
-	    	
-	    	$(document).keydown(handleKeyDown);
-	    }
-	    else {
-	    	image.css("cursor", dim.disabledCursor);
-	    	image.mousedown(function(e) {
-	    		e.preventDefault();
-	    	});
-	    }
+            if(dim.allowPan || dim.allowZoom) {
+                image.mousedown(handleMouseDown);
+                image.mouseover(handleMouseOver);
+                image.mouseout(handleMouseOut);
+            }
+            else {
+                image.css("cursor", dim.disabledCursor);
+                image.mousedown(function(e) {
+                    e.preventDefault();
+                });
+            }
 
-		}
+			//image.mouseup(disableAndStore);
+			//
+		},
 
-		,imagetool: function(settings) {
+		imagetool: function(settings) {
 			return this.each(function() {
 				var image = $(this).css({display: "none"});
 
@@ -281,11 +221,11 @@
 
 				// Set up the viewport        
 				var viewportCss = {
-					backgroundColor: "#fff"
-					,position: "relative"
-					,overflow: "hidden"
-					,width: dim.viewportWidth + "px"
-					,height: dim.viewportHeight + "px"
+					backgroundColor: "#fff",
+					position: "relative",
+					overflow: "hidden",
+					width: dim.viewportWidth + "px",
+					height: dim.viewportHeight + "px"
 				};
 				var viewportElement = $("<div class=\"viewport\"><\/div>");
 				viewportElement.css(viewportCss);
@@ -296,21 +236,21 @@
 					$("<img class=\"loading\" src=\"" + dim.loading + "\" />").css(loadingCss).insertAfter(image);
 				}
 
-
+                $(this).next("img").remove();
+                $(this).setup();
 
 				image.load(function() {
 					$(this).next("img").remove();
 					$(this).setup();
-
 				});
 
-				if($.browser.msie) {
+				if(/msie/.test(navigator.userAgent)) {
 					image.attr("src", image.attr("src") + '?' + (Math.round(2048 * Math.random())));
 				}
 			}); // end this.each
-		} // End imagetool()
+		}, // End imagetool()
 		
-		,store: function() {
+		store: function() {
 		var image = $(this);
 		var dim = image.data("dim");
 
@@ -322,14 +262,54 @@
 		dim.bottomX = dim.topX + (dim.viewportWidth / scale);
 		dim.bottomY = dim.topY + (dim.viewportHeight / scale);
 
-		if(typeof dim.callback == 'function') {
-			dim.callback(parseInt(dim.topX), parseInt(dim.topY), parseInt(dim.bottomX), parseInt(dim.bottomY));
+		if(typeof dim.callback === 'function') {
+			dim.callback(parseInt(dim.topX, 10), parseInt(dim.topY, 10), parseInt(dim.bottomX, 10), parseInt(dim.bottomY, 10));
 		}
 		return image;
-	}
+	},
 
+	disableAndStore: function() {
+		$(this).unbind("mousemove").store();      
+	},
 
-	,zoom: function(e) {
+	zoomIn: function(){
+		var factor = 3;
+
+		var image = $(this);
+		var dim = image.data("dim");
+
+		dim.oldWidth = dim.width;
+		dim.oldHeight = dim.height;
+
+		dim.width = ((factor/100) * dim.width) + dim.width;
+		dim.height = ((factor/100) * dim.height) + dim.height;
+
+		if(image.resize()) {
+			dim.origoY = dim.origoY + factor;
+		}
+		image.store();
+	},
+	
+	zoomOut: function(){
+		var factor = -3;
+		
+		var image = $(this);
+		var dim = image.data("dim");
+
+		dim.oldWidth = dim.width;
+		dim.oldHeight = dim.height;
+
+		dim.width = ((factor/100) * dim.width) + dim.width;
+		dim.height = ((factor/100) * dim.height) + dim.height;
+
+		if(image.resize()) {
+			dim.origoY = dim.origoY + factor;
+		}
+		image.store();
+	},
+	
+	
+	zoom: function(e) {
 		e.preventDefault();
 		var image = $(this);
 		var dim = image.data("dim");
@@ -345,9 +325,9 @@
 		if(image.resize()) {
 			dim.origoY = e.clientY;
 		}
-	}
+	},
 
-	,pan: function(e) {
+	pan: function(e) {
 		e.preventDefault();
 		var image = $(this);
 		var dim = image.data("dim");
@@ -367,11 +347,11 @@
 		dim.x = targetX;
 		dim.y = targetY;
 		image.move();
-	} // end pan
+	}, // end pan
 
 
 
-	,move: function() {
+	move: function() {
 		var image = $(this);
 		var dim = image.data("dim");
 		var minX = -dim.width + dim.viewportWidth;
@@ -393,45 +373,41 @@
 
 
 		$(this).css({
-			left: dim.x + "px"
-			,top: dim.y + "px"
+			left: dim.x + "px",
+			top: dim.y + "px"
 		});
 		return image;
-	}
+	},
 
-
-
-
-
-	,resize: function() {
+	resize: function() {
 		var image = $(this);
 		var dim = image.data("dim");
 		// When attempting to scale the image below the minimum, set the size to minimum
 		var wasResized = true;
 		if(dim.width < dim.viewportWidth) {
-			dim.height = parseInt(dim.actualHeight * (dim.viewportWidth/dim.actualWidth));
+			dim.height = parseInt(dim.actualHeight * (dim.viewportWidth/dim.actualWidth), 10);
 			dim.width = dim.viewportWidth;
 			wasResized = false;
 
 		}
 
 		if(dim.height < dim.viewportHeight) {
-			dim.width = parseInt(dim.actualWidth * (dim.viewportHeight/dim.actualHeight));
+			dim.width = parseInt(dim.actualWidth * (dim.viewportHeight/dim.actualHeight), 10);
 			dim.height = dim.viewportHeight;
 			wasResized = false;
 		}
 
 
 		if(dim.width > dim.maxWidth) {
-			dim.height = parseInt(dim.height * (dim.maxWidth/dim.width));
+			dim.height = parseInt(dim.height * (dim.maxWidth/dim.width), 10);
 			dim.width = dim.maxWidth;
 			wasResized = false;
 		}
 
 
 		$(this).css({
-			width: dim.width + "px"
-			,height: dim.height + "px"
+			width: dim.width + "px",
+			height: dim.height + "px"
 		});
 
 
